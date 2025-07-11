@@ -1,3 +1,4 @@
-pandas
-numpy
-nltk
+pandas~=2.3.0
+numpy~=2.3.1
+nltk~=3.9.1
+spacy~=3.8.7
