@@ -1,18 +1,21 @@
-
 # Makefile for NLP Practice 2
 
 # --- Variables ---
 # Use the SHELL variable to detect the current shell
 SHELL_TYPE := $(shell echo $(SHELL) | awk -F/ '{print $$NF}')
 VENV_DIR = .venv
-PYTHON = $(VENV_DIR)/bin/python
-PIP = pip
+PYTHON = ./.venv/bin/python
+PIP = ./.venv/bin/pip
 JUPYTER = $(VENV_DIR)/bin/jupyter
 NOTEBOOK_FILE = "Práctica 2 - Recuperación de Información.ipynb"
+QRELS_FILE = "cranfield-trec-dataset/cranqrel.trec.txt"
+RESULTS_TITLE_FILE = "trec_results_title.txt"
+RESULTS_TT_FILE = "trec_results_title_text.txt"
+
 
 # --- Targets ---
 
-.PHONY: all install setup-venv find-imports clean help
+.PHONY: all install setup-venv find-imports clean help run evaluate
 
 all: help
 
@@ -33,6 +36,20 @@ setup-venv:
 	else \
 		echo "Virtual environment already exists."; \
 	fi
+
+# Run the Jupyter Notebook
+run: install
+	@echo "Executing Jupyter Notebook: $(NOTEBOOK_FILE)..."
+	@$(JUPYTER) nbconvert --to notebook --execute --inplace --allow-errors $(NOTEBOOK_FILE)
+	@echo "✅ Notebook executed successfully."
+
+# Evaluate the results using trec_eval
+evaluate: run
+	@echo "\n\033[34m--- Evaluating Title-Only Model (with Query Expansion) ---\033[0m"
+	@trec_eval $(QRELS_FILE) $(RESULTS_TITLE_FILE) | grep -E "^map |^P_10 "
+	@echo "\n\033[34m--- Evaluating Title+Text Model (with Query Expansion) ---\033[0m"
+	@trec_eval $(QRELS_FILE) $(RESULTS_TT_FILE) | grep -E "^map |^P_10 "
+
 
 # Find and print all unique imports from the notebook
 find-imports:
@@ -58,6 +75,8 @@ help:
 	@echo ""
 	@echo "\033[33mUsage:\033[0m"
 	@echo "  \033[32mmake install\033[0m      - Create virtual environment and install dependencies."
+	@echo "  \033[32mmake run\033[0m          - Execute the Jupyter Notebook."
+	@echo "  \033[32mmake evaluate\033[0m   - Run the notebook and evaluate the results."
 	@echo "  \033[32mmake find-imports\033[0m - Analyze the notebook and list all imported libraries."
 	@echo "  \033[32mmake clean\033[0m        - Remove the virtual environment."
 	@echo ""
