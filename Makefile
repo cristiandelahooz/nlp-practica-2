@@ -6,7 +6,7 @@
 SHELL_TYPE := $(shell echo $(SHELL) | awk -F/ '{print $$NF}')
 VENV_DIR = .venv
 PYTHON = $(VENV_DIR)/bin/python
-PIP = $(VENV_DIR)/bin/pip
+PIP = pip
 JUPYTER = $(VENV_DIR)/bin/jupyter
 NOTEBOOK_FILE = "Práctica 2 - Recuperación de Información.ipynb"
 
